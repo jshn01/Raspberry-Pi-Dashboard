@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Raspberry Pi Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body { font-family: Arial; background: #1e1e2f; color: #f0f0f0; text-align: center; }
+h1 { margin-bottom: 20px; }
+.card { background: #2c2c3e; padding: 20px; margin: 10px auto; width: 320px; border-radius: 10px; }
+.value { font-size: 2em; margin-top: 5px; color: #ffffff; }
+.warning { color: #ff5555; }
+canvas { background: #2c2c3e; margin: 20px auto; display: block; border-radius: 10px; }
+</style>
+</head>
+<body>
+<h1>Jashan's Raspberry Pi 4 </h1>
+
+<div class="card">
+    CPU Usage: <div id="cpu_usage" class="value"></div>
+</div>
+
+<div class="card">
+    CPU Temp: <div id="cpu_temp" class="value"></div>
+</div>
+
+<div class="card">
+    RAM Usage: <div id="ram_usage" class="value"></div>
+</div>
+
+<div class="card">
+    RAM Percentage: <div id="ram_percentage" class="value"></div>
+</div>
+
+<div class="card" style="background: #552222; cursor: pointer;" onclick="shutdownPi()">
+    <div class="value" style="font-size: 1.5em;font-weight: bold;">SHUTDOWN PI</div>
+</div>
+
+<div class="card" style="background: #223355; cursor: pointer;" onclick="rebootPi()">
+    <div class="value" style="font-size: 1.5em; font-weight: bold;">REBOOT PI</div>
+</div>
+
+<div class="card" style="background:rgb(62, 94, 158); cursor: pointer;" onclick="startRetro()">
+    <div class="value" style="font-size: 1.5em;">OPEN RETRO PI</div>
+</div>
+
+<script>
+async function updateStats() {
+    const res = await fetch('/api');
+    const data = await res.json();
+
+    document.getElementById('cpu_usage').textContent = data.cpu_usage;
+    document.getElementById('cpu_temp').textContent = data.cpu_temp;
+    document.getElementById('ram_usage').textContent = data.ram_str;
+    document.getElementById("ram_percentage").textContent = data.ram_percentage
+}
+
+async function shutdownPi() {
+    if (confirm("Are you sure you want to shut down the Raspberry Pi?")) {
+        try {
+            await fetch('/shutdown', { method: 'POST' });
+            alert("Shutdown command sent. The dashboard will go offline shortly.");
+        } catch (err) {
+            alert("Failed to send shutdown command.");
+        }
+    }
+}
+
+async function rebootPi() {
+    if (confirm("Are you sure you want to RESTART the Raspberry Pi?")) {
+        try {
+            await fetch('/reboot', { method: 'POST' });
+            alert("Reboot command sent. The site will be back up in a minute.");
+            // Optional: Reload the page after a delay
+            setTimeout(() => { location.reload(); }, 30000); 
+        } catch (err) {
+            alert("Failed to send reboot command.");
+        }
+    }
+}
+
+async function startRetro() {
+    if (confirm("Are you sure you want to open RetroPi?")) {
+        try {
+            await fetch('/OpenRetroPi', { method: 'POST'});
+            alert("Opening RetroPi now");
+        } catch (err) {
+            alert("Failed to open RetroPi")
+        }
+    }
+}
+
+setInterval(updateStats, 500);
+updateStats();
+</script>
+</body>
+</html>
+
