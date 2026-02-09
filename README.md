@@ -1,0 +1,1 @@
+To use this, please install Flask, psutil (Which should already be downloaded on Raspberry OS) and os (which should already be downloaded on Raspberry OS). To install this, look at there github repositories respectively.
